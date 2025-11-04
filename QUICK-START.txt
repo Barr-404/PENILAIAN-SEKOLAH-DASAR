@@ -1,0 +1,58 @@
+╔══════════════════════════════════════════════════════════════════╗
+║              QUICK SETUP GUIDE - SEKOLAH DASAR APP              ║
+╚══════════════════════════════════════════════════════════════════╝
+
+🎯 TUJUAN: Setup website penilaian sekolah dasar dalam 5 menit
+
+📋 LANGKAH SETUP:
+
+1️⃣  INSTALL NODE.JS
+    • Kunjungi: https://nodejs.org
+    • Download versi LTS (Long Term Support)
+    • Jalankan installer, pilih "Add to PATH"
+    • Restart Command Prompt setelah selesai
+
+2️⃣  JALANKAN SETUP OTOMATIS
+    • Buka Command Prompt/PowerShell
+    • Navigate ke folder project:
+      cd "D:\PROUDUK\Penilain sekolah dasar"
+    • Jalankan: setup.bat
+    • Tunggu hingga selesai (3-5 menit)
+
+3️⃣  AKSES WEBSITE
+    • Browser otomatis terbuka: http://localhost:3000
+    • Atau buka manual di browser
+
+🧪 TEST WEBSITE:
+
+✅ Register akun guru baru
+✅ Login dengan akun yang dibuat  
+✅ Tambah mata pelajaran (contoh: Matematika)
+✅ Tambah siswa ke mata pelajaran
+✅ Input nilai tugas dan ulangan
+✅ Export hasil ke Excel
+
+🔧 JIKA ADA MASALAH:
+
+❌ "node is not recognized"
+   → Install Node.js dan restart Command Prompt
+
+❌ "npm install failed" 
+   → Cek koneksi internet
+   → Jalankan: npm cache clean --force
+
+❌ "Database connection failed"
+   → Cek file .env.local
+   → Pastikan DATABASE_URL benar
+
+❌ Website tidak bisa dibuka
+   → Cek firewall/antivirus
+   → Pastikan port 3000 tidak digunakan aplikasi lain
+
+📞 BANTUAN:
+   • Baca file INSTALL.md untuk panduan detail
+   • Screenshot error dan tanyakan jika ada masalah
+
+🎉 SELAMAT! Website siap digunakan untuk mengelola nilai siswa!
+
+═══════════════════════════════════════════════════════════════════
