@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { name } = await request.json()
+    const { name, kelas, semester } = await request.json()
 
     if (!name || name.trim() === '') {
       return NextResponse.json(
@@ -41,6 +41,8 @@ export async function POST(request: Request) {
     const subject = await prisma.subject.create({
       data: {
         name: name.trim(),
+        kelas: kelas?.trim() || null,
+        semester: semester?.trim() || null,
         teacherId: session.user.id
       }
     })

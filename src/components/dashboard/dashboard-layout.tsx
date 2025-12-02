@@ -10,7 +10,7 @@ import {
   BookOpen, 
   Users, 
   BarChart3, 
-  Settings, 
+  UserCircle, 
   LogOut,
   Menu,
   X
@@ -20,7 +20,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
   { name: 'Mata Pelajaran', href: '/dashboard/subjects', icon: BookOpen },
   { name: 'Siswa', href: '/dashboard/students', icon: Users },
-  { name: 'Pengaturan', href: '/dashboard/settings', icon: Settings },
+  { name: 'Profil Guru', href: '/dashboard/profile', icon: UserCircle },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

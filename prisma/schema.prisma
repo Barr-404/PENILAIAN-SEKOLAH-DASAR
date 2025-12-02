@@ -65,6 +65,8 @@ model VerificationToken {
 model Subject {
   id        String   @id @default(cuid())
   name      String
+  kelas     String?
+  semester  String?
   teacherId String
   teacher   User     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   students  Student[]
@@ -78,6 +80,8 @@ model Student {
   id        String   @id @default(cuid())
   name      String
   nis       String?
+  gender    String?  // L/P (Laki-laki/Perempuan)
+  notes     String?  // Keterangan (KET)
   className String?
   subjectId String
   subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
@@ -92,14 +96,51 @@ model Grade {
   id        String   @id @default(cuid())
   studentId String
   student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  // Kolom lama (sementara dipertahankan)
-  tugas     Float?
-  ulangan   Float?
-  // Kolom baru
-  tugasHarian     Float?
-  ulanganTengahSemester   Float?
-  ulanganAkhirSemester    Float?
-  average   Float?
+  
+  // Lingkup Materi 1 - TP1 sampai TP4
+  lm1_tp1   Float?
+  lm1_tp2   Float?
+  lm1_tp3   Float?
+  lm1_tp4   Float?
+  lm1_sum   Float?  // Sumatif LM1
+  
+  // Lingkup Materi 2 - TP1 sampai TP4  
+  lm2_tp1   Float?
+  lm2_tp2   Float?
+  lm2_tp3   Float?
+  lm2_tp4   Float?
+  lm2_sum   Float?  // Sumatif LM2
+  
+  // Lingkup Materi 3 - TP1 sampai TP4
+  lm3_tp1   Float?
+  lm3_tp2   Float?
+  lm3_tp3   Float?
+  lm3_tp4   Float?
+  lm3_sum   Float?  // Sumatif LM3
+  
+  // Lingkup Materi 4 - TP1 sampai TP4
+  lm4_tp1   Float?
+  lm4_tp2   Float?
+  lm4_tp3   Float?
+  lm4_tp4   Float?
+  lm4_sum   Float?  // Sumatif LM4
+  
+  // Lingkup Materi 5 - TP1 sampai TP4
+  lm5_tp1   Float?
+  lm5_tp2   Float?
+  lm5_tp3   Float?
+  lm5_tp4   Float?
+  lm5_sum   Float?  // Sumatif LM5
+  
+  // Lingkup Materi 6
+  lm6_sum   Float?  // Sumatif LM6
+  
+  // Sumatif Akhir Semester (SAS)
+  semester_final Float?
+  
+  // Nilai Rapor (NR)
+  final_score Float?
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

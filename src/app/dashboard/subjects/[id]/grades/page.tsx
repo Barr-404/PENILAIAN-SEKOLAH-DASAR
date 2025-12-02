@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
-import SubjectDetailPage from '@/components/subjects/subject-detail-page'
+import GradesTable from '@/components/grades/grades-table'
 
 interface Props {
   params: {
@@ -10,7 +10,7 @@ interface Props {
   }
 }
 
-export default async function SubjectPage({ params }: Props) {
+export default async function GradesPage({ params }: Props) {
   const session = await getServerSession(authOptions)
   
   if (!session?.user?.id) {
@@ -30,12 +30,6 @@ export default async function SubjectPage({ params }: Props) {
         },
         orderBy: {
           name: 'asc'
-        }
-      },
-      teacher: {
-        select: {
-          name: true,
-          email: true
         }
       }
     }
@@ -70,15 +64,19 @@ export default async function SubjectPage({ params }: Props) {
         orderBy: {
           name: 'asc'
         }
-      },
-      teacher: {
-        select: {
-          name: true,
-          email: true
-        }
       }
     }
   })
 
-  return <SubjectDetailPage subject={updatedSubject!} />
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-[1400px] mx-auto">
+        <GradesTable
+          subjectId={updatedSubject!.id}
+          subjectName={updatedSubject!.name}
+          students={updatedSubject!.students}
+        />
+      </div>
+    </div>
+  )
 }

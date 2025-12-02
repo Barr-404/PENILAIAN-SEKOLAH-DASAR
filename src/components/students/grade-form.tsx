@@ -7,9 +7,9 @@ import toast from 'react-hot-toast'
 
 interface Grade {
   id: string
-  tugasHarian?: number | null
-  ulanganTengahSemester?: number | null
-  ulanganAkhirSemester?: number | null
+  lm1_tp1?: number | null
+  lm1_sum?: number | null
+  semester_final?: number | null
   average?: number | null
 }
 
@@ -21,17 +21,17 @@ interface GradeFormProps {
 }
 
 export default function GradeForm({ studentId, currentGrade, onSuccess, onCancel }: GradeFormProps) {
-  const [tugasHarian, setTugasHarian] = useState('')
-  const [ulanganTengahSemester, setUlanganTengahSemester] = useState('')
-  const [ulanganAkhirSemester, setUlanganAkhirSemester] = useState('')
+  const [lm1_tp1, setLm1Tp1] = useState('')
+  const [lm1_sum, setLm1Sum] = useState('')
+  const [semester_final, setSemesterFinal] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
     if (currentGrade) {
-      setTugasHarian(currentGrade.tugasHarian?.toString() || '')
-      setUlanganTengahSemester(currentGrade.ulanganTengahSemester?.toString() || '')
-      setUlanganAkhirSemester(currentGrade.ulanganAkhirSemester?.toString() || '')
+      setLm1Tp1(currentGrade.lm1_tp1?.toString() || '')
+      setLm1Sum(currentGrade.lm1_sum?.toString() || '')
+      setSemesterFinal(currentGrade.semester_final?.toString() || '')
     }
   }, [currentGrade])
 
@@ -48,9 +48,9 @@ export default function GradeForm({ studentId, currentGrade, onSuccess, onCancel
         },
         body: JSON.stringify({
           studentId,
-          tugasHarian: tugasHarian ? parseFloat(tugasHarian) : null,
-          ulanganTengahSemester: ulanganTengahSemester ? parseFloat(ulanganTengahSemester) : null,
-          ulanganAkhirSemester: ulanganAkhirSemester ? parseFloat(ulanganAkhirSemester) : null
+          lm1_tp1: lm1_tp1 ? parseFloat(lm1_tp1) : null,
+          lm1_sum: lm1_sum ? parseFloat(lm1_sum) : null,
+          semester_final: semester_final ? parseFloat(semester_final) : null
         }),
       })
 
@@ -94,43 +94,43 @@ export default function GradeForm({ studentId, currentGrade, onSuccess, onCancel
 
       <div className="space-y-4">
         <div>
-          <label htmlFor="tugasHarian" className="block text-sm font-medium text-gray-700 mb-2">
-            Tugas Harian (0-100)
+          <label htmlFor="lm1_tp1" className="block text-sm font-medium text-gray-700 mb-2">
+            LM1 TP1 (0-100)
           </label>
           <Input
-            id="tugasHarian"
+            id="lm1_tp1"
             type="text"
-            placeholder="Masukkan nilai tugas harian"
-            value={tugasHarian}
-            onChange={(e) => handleNumberInput(e.target.value, setTugasHarian)}
+            placeholder="Masukkan nilai LM1 TP1"
+            value={lm1_tp1}
+            onChange={(e) => handleNumberInput(e.target.value, setLm1Tp1)}
             className="text-center font-medium"
           />
         </div>
 
         <div>
-          <label htmlFor="ulanganTengahSemester" className="block text-sm font-medium text-gray-700 mb-2">
-            Ulangan Tengah Semester (0-100)
+          <label htmlFor="lm1_sum" className="block text-sm font-medium text-gray-700 mb-2">
+            LM1 Sumatif (0-100)
           </label>
           <Input
-            id="ulanganTengahSemester"
+            id="lm1_sum"
             type="text"
-            placeholder="Masukkan nilai UTS"
-            value={ulanganTengahSemester}
-            onChange={(e) => handleNumberInput(e.target.value, setUlanganTengahSemester)}
+            placeholder="Masukkan nilai LM1 Sumatif"
+            value={lm1_sum}
+            onChange={(e) => handleNumberInput(e.target.value, setLm1Sum)}
             className="text-center font-medium"
           />
         </div>
 
         <div>
-          <label htmlFor="ulanganAkhirSemester" className="block text-sm font-medium text-gray-700 mb-2">
-            Ulangan Akhir Semester (0-100)
+          <label htmlFor="semester_final" className="block text-sm font-medium text-gray-700 mb-2">
+            Sumatif Akhir Semester (0-100)
           </label>
           <Input
-            id="ulanganAkhirSemester"
+            id="semester_final"
             type="text"
-            placeholder="Masukkan nilai UAS"
-            value={ulanganAkhirSemester}
-            onChange={(e) => handleNumberInput(e.target.value, setUlanganAkhirSemester)}
+            placeholder="Masukkan nilai Sumatif Akhir Semester"
+            value={semester_final}
+            onChange={(e) => handleNumberInput(e.target.value, setSemesterFinal)}
             className="text-center font-medium"
           />
         </div>
@@ -139,12 +139,12 @@ export default function GradeForm({ studentId, currentGrade, onSuccess, onCancel
       <div className="bg-blue-50 border border-blue-200 p-4 rounded-md">
         <p className="text-sm text-blue-800 flex items-center gap-2">
           <span className="text-blue-600">ℹ️</span>
-          <span><strong>Info:</strong> Rata-rata akan dihitung otomatis jika semua nilai diisi.</span>
+          <span><strong>Info:</strong> Masukkan nilai untuk setiap kategori.</span>
         </p>
-        {tugasHarian && ulanganTengahSemester && ulanganAkhirSemester && (
+        {lm1_tp1 && lm1_sum && semester_final && (
           <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
             <span className="text-sm font-medium text-green-800">
-              Rata-rata: <span className="text-lg">{((parseFloat(tugasHarian) + parseFloat(ulanganTengahSemester) + parseFloat(ulanganAkhirSemester)) / 3).toFixed(1)}</span>
+              Rata-rata: <span className="text-lg">{((parseFloat(lm1_tp1) + parseFloat(lm1_sum) + parseFloat(semester_final)) / 3).toFixed(1)}</span>
             </span>
           </div>
         )}

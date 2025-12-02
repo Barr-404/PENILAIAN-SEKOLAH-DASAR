@@ -53,16 +53,37 @@ export async function GET(request: Request) {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet('Nilai Siswa')
 
-    // Header
+    // Header - struktur baru dengan Lingkup Materi
     worksheet.columns = [
       { header: 'No', key: 'no', width: 5 },
+      { header: 'NIS', key: 'nis', width: 12 },
       { header: 'Nama Siswa', key: 'name', width: 25 },
-      { header: 'NIS', key: 'nis', width: 15 },
-      { header: 'Kelas', key: 'className', width: 10 },
-      { header: 'Tugas Harian', key: 'tugasHarian', width: 15 },
-      { header: 'UTS', key: 'ulanganTengahSemester', width: 12 },
-      { header: 'UAS', key: 'ulanganAkhirSemester', width: 12 },
-      { header: 'Rata-rata', key: 'average', width: 12 },
+      { header: 'LM1 TP1', key: 'lm1_tp1', width: 10 },
+      { header: 'LM1 TP2', key: 'lm1_tp2', width: 10 },
+      { header: 'LM1 TP3', key: 'lm1_tp3', width: 10 },
+      { header: 'LM1 TP4', key: 'lm1_tp4', width: 10 },
+      { header: 'LM2 TP1', key: 'lm2_tp1', width: 10 },
+      { header: 'LM2 TP2', key: 'lm2_tp2', width: 10 },
+      { header: 'LM2 TP3', key: 'lm2_tp3', width: 10 },
+      { header: 'LM2 TP4', key: 'lm2_tp4', width: 10 },
+      { header: 'LM3 TP1', key: 'lm3_tp1', width: 10 },
+      { header: 'LM3 TP2', key: 'lm3_tp2', width: 10 },
+      { header: 'LM3 TP3', key: 'lm3_tp3', width: 10 },
+      { header: 'LM3 TP4', key: 'lm3_tp4', width: 10 },
+      { header: 'LM4 TP1', key: 'lm4_tp1', width: 10 },
+      { header: 'LM4 TP2', key: 'lm4_tp2', width: 10 },
+      { header: 'LM4 TP3', key: 'lm4_tp3', width: 10 },
+      { header: 'LM4 TP4', key: 'lm4_tp4', width: 10 },
+      { header: 'LM5 TP1', key: 'lm5_tp1', width: 10 },
+      { header: 'LM5 TP2', key: 'lm5_tp2', width: 10 },
+      { header: 'LM5 TP3', key: 'lm5_tp3', width: 10 },
+      { header: 'LM5 TP4', key: 'lm5_tp4', width: 10 },
+      { header: 'LM1 Sum', key: 'lm1_sum', width: 12 },
+      { header: 'LM2 Sum', key: 'lm2_sum', width: 12 },
+      { header: 'LM3 Sum', key: 'lm3_sum', width: 12 },
+      { header: 'LM4 Sum', key: 'lm4_sum', width: 12 },
+      { header: 'LM5 Sum', key: 'lm5_sum', width: 12 },
+      { header: 'Semester Final', key: 'semester_final', width: 15 },
     ]
 
     // Style header
@@ -81,19 +102,40 @@ export async function GET(request: Request) {
       }
     })
 
-    // Data siswa
+    // Data siswa dengan struktur baru
     subject.students.forEach((student, index) => {
-      const grade = student.grades[0] // Ambil grade pertama (seharusnya hanya 1)
+      const grade = student.grades[0] // Ambil grade pertama
       
       worksheet.addRow({
         no: index + 1,
-        name: student.name,
         nis: student.nis || '-',
-        className: student.className || '-',
-        tugasHarian: grade?.tugasHarian || '-',
-        ulanganTengahSemester: grade?.ulanganTengahSemester || '-',
-        ulanganAkhirSemester: grade?.ulanganAkhirSemester || '-',
-        average: grade?.average || '-'
+        name: student.name,
+        lm1_tp1: grade?.lm1_tp1 || '-',
+        lm1_tp2: grade?.lm1_tp2 || '-',
+        lm1_tp3: grade?.lm1_tp3 || '-',
+        lm1_tp4: grade?.lm1_tp4 || '-',
+        lm2_tp1: grade?.lm2_tp1 || '-',
+        lm2_tp2: grade?.lm2_tp2 || '-',
+        lm2_tp3: grade?.lm2_tp3 || '-',
+        lm2_tp4: grade?.lm2_tp4 || '-',
+        lm3_tp1: grade?.lm3_tp1 || '-',
+        lm3_tp2: grade?.lm3_tp2 || '-',
+        lm3_tp3: grade?.lm3_tp3 || '-',
+        lm3_tp4: grade?.lm3_tp4 || '-',
+        lm4_tp1: grade?.lm4_tp1 || '-',
+        lm4_tp2: grade?.lm4_tp2 || '-',
+        lm4_tp3: grade?.lm4_tp3 || '-',
+        lm4_tp4: grade?.lm4_tp4 || '-',
+        lm5_tp1: grade?.lm5_tp1 || '-',
+        lm5_tp2: grade?.lm5_tp2 || '-',
+        lm5_tp3: grade?.lm5_tp3 || '-',
+        lm5_tp4: grade?.lm5_tp4 || '-',
+        lm1_sum: grade?.lm1_sum || '-',
+        lm2_sum: grade?.lm2_sum || '-',
+        lm3_sum: grade?.lm3_sum || '-',
+        lm4_sum: grade?.lm4_sum || '-',
+        lm5_sum: grade?.lm5_sum || '-',
+        semester_final: grade?.semester_final || '-'
       })
     })
 

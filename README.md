@@ -9,6 +9,14 @@ Website profesional untuk guru sekolah dasar dalam mengelola nilai siswa, dibuat
 - Sistem keamanan menggunakan NextAuth.js
 - Satu akun per guru (tidak boleh duplikat)
 
+✅ **Profil Guru** (New!)
+- Informasi lengkap akun guru (nama, email, NIP, kelas, fase)
+- Upload dan ubah foto profil
+- Status akun dan riwayat aktivitas
+- Data mengajar (statistik mata pelajaran, siswa, nilai)
+- Ganti password dengan validasi keamanan
+- Aktivitas terakhir (login, update mata pelajaran, input nilai)
+
 ✅ **Manajemen Mata Pelajaran**
 - Tambah, edit, dan hapus mata pelajaran
 - Dashboard statistik mata pelajaran

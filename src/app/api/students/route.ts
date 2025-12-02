@@ -14,11 +14,11 @@ export async function POST(request: Request) {
       )
     }
 
-    const { name, nis, className, subjectId } = await request.json()
+    const { name, gender, notes, className, subjectId } = await request.json()
 
-    if (!name || !subjectId) {
+    if (!subjectId) {
       return NextResponse.json(
-        { error: 'Nama siswa dan mata pelajaran wajib diisi' },
+        { error: 'Mata pelajaran wajib diisi' },
         { status: 400 }
       )
     }
@@ -38,29 +38,17 @@ export async function POST(request: Request) {
       )
     }
 
-    // Cek duplikasi NIS dalam mata pelajaran yang sama (jika NIS diisi)
-    if (nis) {
-      const existingStudent = await prisma.student.findFirst({
-        where: {
-          nis: nis.trim(),
-          subjectId
-        }
-      })
-
-      if (existingStudent) {
-        return NextResponse.json(
-          { error: 'NIS sudah terdaftar di mata pelajaran ini' },
-          { status: 400 }
-        )
-      }
-    }
-
+    // Create student dengan Grade record sekaligus
     const student = await prisma.student.create({
       data: {
-        name: name.trim(),
-        nis: nis?.trim() || null,
+        name: name?.trim() || 'Siswa Baru', // Default name jika kosong
+        gender: gender?.trim() || null,
+        notes: notes?.trim() || null,
         className: className?.trim() || null,
-        subjectId
+        subjectId,
+        grades: {
+          create: {} // Create empty grade record untuk enable inline editing
+        }
       },
       include: {
         grades: true,

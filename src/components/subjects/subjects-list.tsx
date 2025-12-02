@@ -4,7 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { BookOpen, Users, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { BookOpen, Users, MoreHorizontal, Pencil, Trash2, Loader2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 interface Subject {
   id: string
@@ -20,7 +21,12 @@ export default function SubjectsList({ subjects }: SubjectsListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const handleDelete = async (subjectId: string) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus mata pelajaran ini?')) {
+    // Gunakan window.confirm sebagai fallback, tetapi dengan style yang lebih baik
+    const userConfirmed = window.confirm(
+      'Apakah Anda yakin ingin menghapus mata pelajaran ini?\n\nSemua data siswa dan nilai akan ikut terhapus dan tidak dapat dikembalikan.'
+    )
+    
+    if (!userConfirmed) {
       return
     }
 
@@ -31,13 +37,17 @@ export default function SubjectsList({ subjects }: SubjectsListProps) {
         method: 'DELETE',
       })
 
+      const data = await response.json()
+
       if (response.ok) {
+        toast.success('Mata pelajaran berhasil dihapus')
         window.location.reload()
       } else {
-        alert('Gagal menghapus mata pelajaran')
+        toast.error(data.error || 'Gagal menghapus mata pelajaran')
       }
     } catch (error) {
-      alert('Terjadi kesalahan')
+      console.error('Delete error:', error)
+      toast.error('Terjadi kesalahan saat menghapus mata pelajaran')
     } finally {
       setDeletingId(null)
     }
@@ -85,8 +95,13 @@ export default function SubjectsList({ subjects }: SubjectsListProps) {
                   size="sm"
                   onClick={() => handleDelete(subject.id)}
                   disabled={deletingId === subject.id}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  {deletingId === subject.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>

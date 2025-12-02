@@ -94,6 +94,7 @@ export default function SubjectDetailPage({ subject }: SubjectDetailPageProps) {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
@@ -118,12 +119,14 @@ export default function SubjectDetailPage({ subject }: SubjectDetailPageProps) {
         </div>
       </div>
 
+      {/* Tabel Input Nilai Excel */}
       <GradesTable 
         subjectId={subject.id}
         subjectName={subject.name}
         students={subject.students}
       />
 
+      {/* Modal Edit Nilai */}
       {editingGrade && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
@@ -145,6 +148,7 @@ export default function SubjectDetailPage({ subject }: SubjectDetailPageProps) {
         </div>
       )}
 
+      {/* Modal Edit Data Siswa */}
       {editingStudent && (
         <StudentEditForm
           student={subject.students.find(s => s.id === editingStudent)!}
