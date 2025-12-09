@@ -78,19 +78,11 @@ export default function DashboardStats({
           {recentSubjects.length > 0 ? (
             <div className="space-y-4">
               {recentSubjects.map((subject) => (
-                <div key={subject.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{subject.name}</p>
-                    <p className="text-sm text-gray-500">
-                      {subject._count.students} siswa
-                    </p>
-                  </div>
-                  <Link 
-                    href={`/dashboard/subjects/${subject.id}`}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                  >
-                    Lihat Detail
-                  </Link>
+                <div key={subject.id}>
+                  <p className="font-medium">{subject.name}</p>
+                  <p className="text-sm text-gray-500">
+                    {subject._count.students} siswa
+                  </p>
                 </div>
               ))}
             </div>

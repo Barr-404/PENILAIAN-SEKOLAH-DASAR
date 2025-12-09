@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,7 +18,9 @@ import {
   Camera,
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
+  Upload,
+  X
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { format } from 'date-fns'
@@ -31,7 +33,6 @@ interface ProfileData {
     email: string | null
     image: string | null
     nip: string | null
-    kelas: string | null
     fase: string | null
     createdAt: string
     updatedAt: string
@@ -59,18 +60,20 @@ interface ProfileData {
 }
 
 export default function ProfilePage() {
-  const { data: session } = useSession()
+  const { data: session, update } = useSession()
   const [profileData, setProfileData] = useState<ProfileData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const [showImageModal, setShowImageModal] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   // Edit form state
   const [editForm, setEditForm] = useState({
     name: '',
     nip: '',
-    kelas: '',
     fase: '',
     image: ''
   })
@@ -100,7 +103,6 @@ export default function ProfilePage() {
       setEditForm({
         name: data.user.name || '',
         nip: data.user.nip || '',
-        kelas: data.user.kelas || '',
         fase: data.user.fase || '',
         image: data.user.image || ''
       })
@@ -132,11 +134,65 @@ export default function ProfilePage() {
       toast.success('Profil berhasil diperbarui')
       setIsEditing(false)
       fetchProfileData()
+      // Update session dengan data baru
+      update({
+        ...session,
+        user: {
+          ...session?.user,
+          name: editForm.name,
+          image: editForm.image
+        }
+      })
     } catch (error: any) {
       console.error('Error updating profile:', error)
       toast.error(error.message || 'Gagal memperbarui profil')
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validasi tipe file
+    if (!file.type.startsWith('image/')) {
+      toast.error('File harus berupa gambar')
+      return
+    }
+
+    // Validasi ukuran file (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Ukuran file maksimal 2MB')
+      return
+    }
+
+    try {
+      setIsUploadingImage(true)
+      
+      // Convert ke base64
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64String = reader.result as string
+        setEditForm({ ...editForm, image: base64String })
+        toast.success('Foto berhasil dipilih')
+      }
+      reader.onerror = () => {
+        toast.error('Gagal membaca file')
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast.error('Gagal mengupload foto')
+    } finally {
+      setIsUploadingImage(false)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setEditForm({ ...editForm, image: '' })
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
     }
   }
 
@@ -246,32 +302,30 @@ export default function ProfilePage() {
                     className="h-32 w-32 rounded-full object-cover border-4 border-blue-100"
                   />
                 ) : (
-                  <div className="h-32 w-32 bg-blue-500 rounded-full flex items-center justify-center border-4 border-blue-100">
+                  <div className="h-32 w-32 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center border-4 border-blue-100 shadow-lg">
                     <span className="text-white text-4xl font-bold">
                       {profileData.user.name?.charAt(0).toUpperCase() || 'G'}
                     </span>
                   </div>
                 )}
+                
                 {isEditing && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                    <Camera className="h-8 w-8 text-white" />
-                  </div>
+                  <>
+                    <div 
+                      className="absolute inset-0 bg-black bg-opacity-60 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                      onClick={() => setShowImageModal(true)}
+                    >
+                      <Camera className="h-6 w-6 text-white mb-1" />
+                      <p className="text-xs text-white font-medium">Tambah foto profil</p>
+                    </div>
+                  </>
                 )}
               </div>
               
-              {isEditing && (
-                <div className="mt-4 w-full">
-                  <Input
-                    type="url"
-                    placeholder="URL foto profil"
-                    value={editForm.image}
-                    onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
-                    className="text-sm"
-                  />
-                  <p className="text-xs text-gray-500 mt-2">
-                    Masukkan URL gambar profil Anda
-                  </p>
-                </div>
+              {isEditing && !editForm.image && (
+                <p className="text-sm text-gray-500 mt-3 text-center">
+                  Klik pada foto untuk mengubah
+                </p>
               )}
             </CardContent>
           </Card>
@@ -338,7 +392,6 @@ export default function ProfilePage() {
                       setEditForm({
                         name: profileData.user.name || '',
                         nip: profileData.user.nip || '',
-                        kelas: profileData.user.kelas || '',
                         fase: profileData.user.fase || '',
                         image: profileData.user.image || ''
                       })
@@ -393,20 +446,6 @@ export default function ProfilePage() {
                     />
                   ) : (
                     <p className="mt-1 text-gray-900">{profileData.user.nip || '-'}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Kelas yang Diajar</label>
-                  {isEditing ? (
-                    <Input
-                      value={editForm.kelas}
-                      onChange={(e) => setEditForm({ ...editForm, kelas: e.target.value })}
-                      placeholder="Contoh: 1, 2, 3"
-                      className="mt-1"
-                    />
-                  ) : (
-                    <p className="mt-1 text-gray-900">{profileData.user.kelas || '-'}</p>
                   )}
                 </div>
 
@@ -614,6 +653,97 @@ export default function ProfilePage() {
           </Card>
         </div>
       </div>
+
+      {/* Modal Upload Foto */}
+      {showImageModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
+              <h3 className="text-2xl font-bold mb-2">Foto Profil</h3>
+              <p className="text-blue-100 text-sm">Pilih atau upload foto profil Anda</p>
+            </div>
+            
+            <div className="p-6">
+              {/* Preview Foto */}
+              <div className="flex justify-center mb-6">
+                {editForm.image ? (
+                  <div className="relative">
+                    <img
+                      src={editForm.image}
+                      alt="Preview"
+                      className="h-40 w-40 rounded-full object-cover border-4 border-blue-100 shadow-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-lg transition-colors"
+                      title="Hapus foto"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="h-40 w-40 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center border-4 border-blue-100 shadow-lg">
+                    <span className="text-white text-5xl font-bold">
+                      {profileData.user.name?.charAt(0).toUpperCase() || 'G'}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Hidden File Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <Button
+                  type="button"
+                  className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-base font-medium"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploadingImage}
+                >
+                  <Upload className="h-5 w-5 mr-2" />
+                  {isUploadingImage ? 'Mengupload...' : 'Upload foto'}
+                </Button>
+
+                {editForm.image && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-12 text-base font-medium border-2 hover:bg-red-50 text-red-600 hover:text-red-700"
+                    onClick={handleRemoveImage}
+                  >
+                    <X className="h-5 w-5 mr-2" />
+                    Hapus foto
+                  </Button>
+                )}
+
+                <p className="text-xs text-gray-500 text-center pt-2">
+                  File maksimal 2MB • Format: JPG, PNG, GIF
+                </p>
+              </div>
+
+              {/* Close Button */}
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full h-12 text-base font-medium"
+                  onClick={() => setShowImageModal(false)}
+                >
+                  Tutup
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

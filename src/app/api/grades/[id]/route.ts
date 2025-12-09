@@ -48,7 +48,8 @@ export async function PATCH(
       'lm3_tp1', 'lm3_tp2', 'lm3_tp3', 'lm3_tp4', 'lm3_sum',
       'lm4_tp1', 'lm4_tp2', 'lm4_tp3', 'lm4_tp4', 'lm4_sum',
       'lm5_tp1', 'lm5_tp2', 'lm5_tp3', 'lm5_tp4', 'lm5_sum',
-      'semester_final'
+      'lm6_tp1', 'lm6_tp2', 'lm6_tp3', 'lm6_tp4', 'lm6_sum',
+      'semester_final', 'final_score'
     ]
 
     const updateData: any = {}

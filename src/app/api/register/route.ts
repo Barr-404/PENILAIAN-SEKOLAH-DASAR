@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, kelas, fase } = await request.json()
+    const { name, email, password, fase } = await request.json()
 
     // Validasi input wajib
     if (!name || !email || !password) {

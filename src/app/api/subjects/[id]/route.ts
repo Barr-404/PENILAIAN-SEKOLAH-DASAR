@@ -88,7 +88,7 @@ export async function PUT(
     }
 
     const subjectId = params.id
-    const { name } = await request.json()
+    const { name, semester } = await request.json()
 
     if (!name || name.trim() === '') {
       return NextResponse.json(
@@ -136,8 +136,9 @@ export async function PUT(
         id: subjectId
       },
       data: {
-        name: name.trim()
-      }
+        name: name.trim(),
+        semester: semester || null,
+      },
     })
 
     return NextResponse.json(updatedSubject, { status: 200 })

@@ -65,6 +65,8 @@ export default function SubjectDetailPage({ subject }: SubjectDetailPageProps) {
 
   const handleExport = async () => {
     try {
+      toast.loading('Mengexport data...', { id: 'export' })
+      
       const response = await fetch(`/api/export?subjectId=${subject.id}`)
       
       if (response.ok) {
@@ -75,7 +77,7 @@ export default function SubjectDetailPage({ subject }: SubjectDetailPageProps) {
         const contentDisposition = response.headers.get('Content-Disposition')
         const fileName = contentDisposition 
           ? contentDisposition.split('filename=')[1].replace(/"/g, '')
-          : `Nilai_${subject.name}_${subject.teacher.name}.xlsx`
+          : `Nilai_${subject.name.replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`
         
         a.href = url
         a.download = fileName
@@ -83,12 +85,16 @@ export default function SubjectDetailPage({ subject }: SubjectDetailPageProps) {
         a.click()
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
+        
+        toast.success('File Excel berhasil didownload', { id: 'export' })
       } else {
-        toast.error('Gagal mengexport data')
+        const error = await response.json()
+        console.error('Export error:', error)
+        toast.error(error.error || 'Gagal mengexport data', { id: 'export' })
       }
     } catch (error) {
       console.error('Export error:', error)
-      toast.error('Terjadi kesalahan saat export')
+      toast.error('Terjadi kesalahan saat export', { id: 'export' })
     }
   }
 

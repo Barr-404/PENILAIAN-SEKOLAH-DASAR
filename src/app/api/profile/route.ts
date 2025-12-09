@@ -26,7 +26,6 @@ export async function GET(request: Request) {
         email: true,
         image: true,
         nip: true,
-        kelas: true,
         fase: true,
         createdAt: true,
         updatedAt: true,
@@ -60,16 +59,15 @@ export async function GET(request: Request) {
     const totalSubjects = user.subjects.length
     const totalStudents = user.subjects.reduce((sum, subject) => sum + subject._count.students, 0)
     
-    // Hitung total nilai yang sudah diinput
-    const totalGrades = await prisma.grade.count({
-      where: {
-        student: {
-          subject: {
-            teacherId: session.user.id
-          }
-        }
-      }
-    })
+    // Hitung total nilai yang sudah diinput dengan query yang lebih efisien
+    const gradesCount = await prisma.$queryRaw<[{count: bigint}]>`
+      SELECT COUNT(*) as count
+      FROM "Grade" g
+      INNER JOIN "Student" s ON g."studentId" = s.id
+      INNER JOIN "Subject" sub ON s."subjectId" = sub.id
+      WHERE sub."teacherId" = ${session.user.id}
+    `
+    const totalGrades = Number(gradesCount[0].count)
 
     // Ambil aktivitas terakhir
     const lastSubjectUpdate = user.subjects.length > 0 
@@ -78,21 +76,17 @@ export async function GET(request: Request) {
         , user.subjects[0].updatedAt)
       : null
 
-    const lastGradeUpdate = await prisma.grade.findFirst({
-      where: {
-        student: {
-          subject: {
-            teacherId: session.user.id
-          }
-        }
-      },
-      orderBy: {
-        updatedAt: 'desc'
-      },
-      select: {
-        updatedAt: true
-      }
-    })
+    // Query untuk last grade update yang lebih efisien
+    const lastGradeResult = await prisma.$queryRaw<[{updatedAt: Date}]>`
+      SELECT g."updatedAt"
+      FROM "Grade" g
+      INNER JOIN "Student" s ON g."studentId" = s.id
+      INNER JOIN "Subject" sub ON s."subjectId" = sub.id
+      WHERE sub."teacherId" = ${session.user.id}
+      ORDER BY g."updatedAt" DESC
+      LIMIT 1
+    `
+    const lastGradeUpdate = lastGradeResult[0]?.updatedAt || null
 
     return NextResponse.json({
       user: {
@@ -101,7 +95,6 @@ export async function GET(request: Request) {
         email: user.email,
         image: user.image,
         nip: user.nip,
-        kelas: user.kelas,
         fase: user.fase,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
@@ -116,7 +109,11 @@ export async function GET(request: Request) {
       lastActivity: {
         lastLogin: user.updatedAt,
         lastSubjectUpdate,
-        lastGradeUpdate: lastGradeUpdate?.updatedAt || null
+        lastGradeUpdate: lastGradeUpdate
+      }
+    }, {
+      headers: {
+        'Cache-Control': 'private, max-age=60, stale-while-revalidate=120'
       }
     })
   } catch (error) {
@@ -139,7 +136,7 @@ export async function PUT(request: Request) {
       )
     }
 
-    const { name, nip, kelas, fase, image } = await request.json()
+    const { name, nip, fase, image } = await request.json()
 
     // Validasi input
     if (!name?.trim()) {
@@ -155,7 +152,6 @@ export async function PUT(request: Request) {
       data: {
         name: name.trim(),
         nip: nip?.trim() || null,
-        kelas: kelas || null,
         fase: fase || null,
         image: image || null,
       },
@@ -165,7 +161,6 @@ export async function PUT(request: Request) {
         email: true,
         image: true,
         nip: true,
-        kelas: true,
         fase: true,
       }
     })

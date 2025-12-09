@@ -14,7 +14,6 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [kelas, setKelas] = useState('')
   const [fase, setFase] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -29,12 +28,6 @@ export default function RegisterPage() {
 
     if (password !== confirmPassword) {
       setError('Password dan konfirmasi password tidak sama')
-      setIsLoading(false)
-      return
-    }
-
-    if (!kelas) {
-      setError('Silakan pilih kelas yang diajar')
       setIsLoading(false)
       return
     }
@@ -56,7 +49,6 @@ export default function RegisterPage() {
           name,
           email,
           password,
-          kelas,
           fase: fase.trim() || null // Kirim fase atau null jika kosong
         }),
       })
@@ -116,24 +108,6 @@ export default function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="kelas" className="text-sm font-medium">
-                Kelas yang Diajar
-              </label>
-              <Select value={kelas} onValueChange={setKelas}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kelas yang diajar" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Kelas 1</SelectItem>
-                  <SelectItem value="2">Kelas 2</SelectItem>
-                  <SelectItem value="3">Kelas 3</SelectItem>
-                  <SelectItem value="4">Kelas 4</SelectItem>
-                  <SelectItem value="5">Kelas 5</SelectItem>
-                  <SelectItem value="6">Kelas 6</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
             <div className="space-y-2">
               <label htmlFor="fase" className="text-sm font-medium">

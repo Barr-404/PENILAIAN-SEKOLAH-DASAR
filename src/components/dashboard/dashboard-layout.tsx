@@ -19,7 +19,7 @@ import {
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
   { name: 'Mata Pelajaran', href: '/dashboard/subjects', icon: BookOpen },
-  { name: 'Siswa', href: '/dashboard/students', icon: Users },
+  { name: 'Siswa', href: '/dashboard/siswa', icon: Users },
   { name: 'Profil Guru', href: '/dashboard/profile', icon: UserCircle },
 ]
 
@@ -57,12 +57,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link
                   key={item.name}
                   href={item.href}
+                  prefetch={true}
                   className={cn(
                     "group flex items-center px-3 py-2 text-sm font-medium rounded-md mb-1 transition-colors",
                     isActive 
                       ? "bg-blue-100 text-blue-700" 
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   )}
+                  onClick={() => setSidebarOpen(false)}
                 >
                   <Icon 
                     className={cn(
