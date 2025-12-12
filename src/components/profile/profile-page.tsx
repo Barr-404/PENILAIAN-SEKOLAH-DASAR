@@ -20,7 +20,9 @@ import {
   CheckCircle,
   XCircle,
   Upload,
-  X
+  X,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { format } from 'date-fns'
@@ -65,6 +67,8 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false)
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false)
+  const [deleteConfirmation, setDeleteConfirmation] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [showImageModal, setShowImageModal] = useState(false)
@@ -237,6 +241,52 @@ export default function ProfilePage() {
     }
   }
 
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmation !== 'HAPUS') {
+      toast.error('Ketik "HAPUS" untuk mengkonfirmasi penghapusan akun')
+      return
+    }
+
+    const confirmed = window.confirm(
+      '⚠️ PERINGATAN TERAKHIR!\n\n' +
+      'Menghapus akun akan:\n' +
+      '• Menghapus SEMUA mata pelajaran Anda\n' +
+      '• Menghapus SEMUA data siswa dan nilai\n' +
+      '• Tindakan ini TIDAK DAPAT DIBATALKAN\n\n' +
+      'Apakah Anda YAKIN ingin melanjutkan?'
+    )
+
+    if (!confirmed) return
+
+    try {
+      setIsSaving(true)
+      
+      const response = await fetch('/api/profile/delete-account', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Gagal menghapus akun')
+      }
+
+      toast.success('Akun berhasil dihapus. Anda akan dialihkan...')
+      
+      // Sign out dan redirect ke halaman login
+      setTimeout(() => {
+        signOut({ callbackUrl: '/login' })
+      }, 2000)
+      
+    } catch (error: any) {
+      console.error('Error deleting account:', error)
+      toast.error(error.message || 'Gagal menghapus akun')
+      setIsSaving(false)
+    }
+  }
+
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), 'dd MMMM yyyy, HH:mm', { locale: id })
@@ -274,7 +324,7 @@ export default function ProfilePage() {
         </div>
         <Button
           variant="outline"
-          onClick={() => signOut()}
+          onClick={() => signOut({ callbackUrl: '/login' })}
           className="text-red-600 hover:text-red-700 hover:bg-red-50"
         >
           <LogOut className="h-4 w-4 mr-2" />
@@ -490,6 +540,7 @@ export default function ProfilePage() {
                     {profileData.statistics.totalStudents}
                   </p>
                   <p className="text-sm text-gray-600">Total Siswa</p>
+                  <p className="text-xs text-gray-500 mt-1">(Siswa unik)</p>
                 </div>
 
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
@@ -645,6 +696,90 @@ export default function ProfilePage() {
                       className="bg-blue-600 hover:bg-blue-700"
                     >
                       {isSaving ? 'Mengubah...' : 'Ubah Password'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Zona Bahaya - Hapus Akun */}
+          <Card className="border-2 border-red-200">
+            <CardHeader className="bg-red-50">
+              <CardTitle className="flex items-center gap-2 text-red-900">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+                Zona Bahaya
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {!showDeleteAccount ? (
+                <div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Menghapus akun akan menghapus semua data Anda termasuk mata pelajaran, siswa, dan nilai secara permanen.
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDeleteAccount(true)}
+                    className="border-red-600 text-red-600 hover:bg-red-50 w-full md:w-auto"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Hapus Akun
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="font-bold text-red-900 mb-2">Peringatan!</h4>
+                        <p className="text-sm text-red-800 mb-2">
+                          Menghapus akun akan menghapus secara permanen:
+                        </p>
+                        <ul className="text-sm text-red-800 space-y-1 list-disc list-inside">
+                          <li>Semua mata pelajaran ({profileData?.statistics.totalSubjects} mata pelajaran)</li>
+                          <li>Semua data siswa ({profileData?.statistics.totalStudents} siswa)</li>
+                          <li>Semua nilai yang telah diinput ({profileData?.statistics.totalGrades} nilai)</li>
+                          <li>Riwayat aktivitas dan data profil</li>
+                        </ul>
+                        <p className="text-sm font-bold text-red-900 mt-3">
+                          ⚠️ Tindakan ini TIDAK DAPAT DIBATALKAN!
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 block mb-2">
+                      Ketik <span className="font-bold text-red-600">HAPUS</span> untuk mengkonfirmasi
+                    </label>
+                    <Input
+                      type="text"
+                      value={deleteConfirmation}
+                      onChange={(e) => setDeleteConfirmation(e.target.value)}
+                      placeholder="Ketik HAPUS"
+                      className="border-red-300 focus:ring-red-500 focus:border-red-500"
+                    />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowDeleteAccount(false)
+                        setDeleteConfirmation('')
+                      }}
+                      disabled={isSaving}
+                      className="flex-1"
+                    >
+                      Batal
+                    </Button>
+                    <Button
+                      onClick={handleDeleteAccount}
+                      disabled={isSaving || deleteConfirmation !== 'HAPUS'}
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      {isSaving ? 'Menghapus...' : 'Hapus Akun Permanen'}
                     </Button>
                   </div>
                 </div>

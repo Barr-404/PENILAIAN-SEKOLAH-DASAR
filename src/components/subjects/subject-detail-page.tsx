@@ -3,11 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Download, Users, BookOpen } from 'lucide-react'
+import { Users, BookOpen } from 'lucide-react'
 import StudentEditForm from '@/components/students/student-edit-form'
 import GradeForm from '@/components/students/grade-form'
 import GradesTable from '@/components/grades/grades-table'
-import toast from 'react-hot-toast'
 
 interface Subject {
   id: string
@@ -63,41 +62,6 @@ export default function SubjectDetailPage({ subject }: SubjectDetailPageProps) {
   const [editingGrade, setEditingGrade] = useState<string | null>(null)
   const [editingStudent, setEditingStudent] = useState<string | null>(null)
 
-  const handleExport = async () => {
-    try {
-      toast.loading('Mengexport data...', { id: 'export' })
-      
-      const response = await fetch(`/api/export?subjectId=${subject.id}`)
-      
-      if (response.ok) {
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        
-        const contentDisposition = response.headers.get('Content-Disposition')
-        const fileName = contentDisposition 
-          ? contentDisposition.split('filename=')[1].replace(/"/g, '')
-          : `Nilai_${subject.name.replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`
-        
-        a.href = url
-        a.download = fileName
-        document.body.appendChild(a)
-        a.click()
-        window.URL.revokeObjectURL(url)
-        document.body.removeChild(a)
-        
-        toast.success('File Excel berhasil didownload', { id: 'export' })
-      } else {
-        const error = await response.json()
-        console.error('Export error:', error)
-        toast.error(error.error || 'Gagal mengexport data', { id: 'export' })
-      }
-    } catch (error) {
-      console.error('Export error:', error)
-      toast.error('Terjadi kesalahan saat export', { id: 'export' })
-    }
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -110,17 +74,6 @@ export default function SubjectDetailPage({ subject }: SubjectDetailPageProps) {
             <Users className="h-4 w-4" />
             {subject.students.length} siswa terdaftar
           </p>
-        </div>
-        
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={handleExport}
-            disabled={subject.students.length === 0}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export Excel
-          </Button>
         </div>
       </div>
 

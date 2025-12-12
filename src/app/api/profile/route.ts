@@ -57,7 +57,18 @@ export async function GET(request: Request) {
 
     // Hitung statistik mengajar
     const totalSubjects = user.subjects.length
-    const totalStudents = user.subjects.reduce((sum, subject) => sum + subject._count.students, 0)
+    
+    // Hitung siswa UNIK berdasarkan nama (karena siswa yang sama bisa ada di beberapa mata pelajaran)
+    const uniqueStudents = await prisma.$queryRaw<[{count: bigint}]>`
+      SELECT COUNT(DISTINCT s.name) as count
+      FROM "Student" s
+      INNER JOIN "Subject" sub ON s."subjectId" = sub.id
+      WHERE sub."teacherId" = ${session.user.id}
+    `
+    const totalStudents = Number(uniqueStudents[0].count)
+    
+    // Hitung total ENTRI siswa (termasuk duplikasi di berbagai mata pelajaran)
+    const totalStudentEntries = user.subjects.reduce((sum, subject) => sum + subject._count.students, 0)
     
     // Hitung total nilai yang sudah diinput dengan query yang lebih efisien
     const gradesCount = await prisma.$queryRaw<[{count: bigint}]>`
@@ -101,9 +112,9 @@ export async function GET(request: Request) {
       },
       statistics: {
         totalSubjects,
-        totalStudents,
+        totalStudents, // Siswa unik
         totalGrades,
-        averageStudentsPerSubject: totalSubjects > 0 ? Math.round(totalStudents / totalSubjects) : 0
+        averageStudentsPerSubject: totalSubjects > 0 ? Math.round(totalStudentEntries / totalSubjects) : 0
       },
       subjects: user.subjects,
       lastActivity: {

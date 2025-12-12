@@ -51,10 +51,11 @@ export default function ExportAllButton() {
       size="lg"
       onClick={handleExportAll}
       disabled={isExporting}
-      className="bg-emerald-600 text-white hover:bg-emerald-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 h-12 px-6"
+      className="w-full sm:w-auto bg-emerald-600 text-white hover:bg-emerald-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 h-11 sm:h-12 px-4 sm:px-6"
     >
-      <Download className="h-5 w-5 mr-2" />
-      {isExporting ? 'Mengexport...' : 'Export Semua ke Excel'}
+      <Download className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+      <span className="hidden sm:inline">{isExporting ? 'Mengexport...' : 'Export Semua ke Excel'}</span>
+      <span className="sm:hidden">{isExporting ? 'Mengexport...' : 'Export Semua'}</span>
     </Button>
   )
 }

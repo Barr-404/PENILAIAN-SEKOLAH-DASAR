@@ -50,8 +50,8 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/login',
-    // NextAuth tidak mendukung signUp page secara built-in
-    // signUp: '/register' // Dihapus karena tidak supported
+    signOut: '/login',
+    error: '/login',
   },
   callbacks: {
     async jwt({ token, user }) {

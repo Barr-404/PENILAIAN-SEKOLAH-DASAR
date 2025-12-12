@@ -74,6 +74,8 @@ model Subject {
   updatedAt DateTime @updatedAt
 
   @@unique([name, teacherId])
+  @@index([teacherId])
+  @@index([semester])
 }
 
 model Student {
@@ -90,12 +92,16 @@ model Student {
   updatedAt DateTime @updatedAt
 
   @@unique([nis, subjectId])
+  @@index([subjectId])
+  @@index([name])
 }
 
 model Grade {
   id        String   @id @default(cuid())
   studentId String
   student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  @@index([studentId])
   
   // Lingkup Materi 1 - TP1 sampai TP4
   lm1_tp1   Float?

@@ -17,15 +17,24 @@ export default async function SubjectPage({ params }: Props) {
     return null
   }
 
-  // Ambil data mata pelajaran dengan siswa dan nilai
+  // Ambil data mata pelajaran dengan siswa dan nilai (optimized)
   const subject = await prisma.subject.findFirst({
     where: {
       id: params.id,
       teacherId: session.user.id
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      semester: true,
       students: {
-        include: {
+        select: {
+          id: true,
+          name: true,
+          nis: true,
+          gender: true,
+          notes: true,
+          className: true,
           grades: true
         },
         orderBy: {
@@ -56,15 +65,24 @@ export default async function SubjectPage({ params }: Props) {
     }
   }
 
-  // Fetch ulang data setelah membuat grade records
+  // Fetch ulang data setelah membuat grade records (optimized)
   const updatedSubject = await prisma.subject.findFirst({
     where: {
       id: params.id,
       teacherId: session.user.id
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      semester: true,
       students: {
-        include: {
+        select: {
+          id: true,
+          name: true,
+          nis: true,
+          gender: true,
+          notes: true,
+          className: true,
           grades: true
         },
         orderBy: {

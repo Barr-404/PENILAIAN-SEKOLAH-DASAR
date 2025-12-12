@@ -27,16 +27,31 @@ export async function GET(request: Request) {
     const workbook = new ExcelJS.Workbook()
 
     if (subjectId) {
-      // Export single subject
+      // Export single subject (optimized query)
       const subject = await prisma.subject.findFirst({
         where: {
           id: subjectId,
           teacherId: session.user.id
         },
-        include: {
-          teacher: true,
+        select: {
+          id: true,
+          name: true,
+          semester: true,
+          teacher: {
+            select: {
+              name: true,
+              email: true,
+              nip: true
+            }
+          },
           students: {
-            include: {
+            select: {
+              id: true,
+              name: true,
+              nis: true,
+              gender: true,
+              notes: true,
+              className: true,
               grades: true
             },
             orderBy: { name: 'asc' }
@@ -69,15 +84,30 @@ export async function GET(request: Request) {
         },
       })
     } else {
-      // Export all subjects, grouped by semester
+      // Export all subjects, grouped by semester (optimized query)
       const subjects = await prisma.subject.findMany({
         where: {
           teacherId: session.user.id
         },
-        include: {
-          teacher: true,
+        select: {
+          id: true,
+          name: true,
+          semester: true,
+          teacher: {
+            select: {
+              name: true,
+              email: true,
+              nip: true
+            }
+          },
           students: {
-            include: {
+            select: {
+              id: true,
+              name: true,
+              nis: true,
+              gender: true,
+              notes: true,
+              className: true,
               grades: true
             },
             orderBy: { name: 'asc' }
