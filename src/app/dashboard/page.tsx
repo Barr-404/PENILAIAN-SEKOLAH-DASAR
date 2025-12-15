@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import DashboardStats from '@/components/dashboard/dashboard-stats'
 
+export const dynamic = 'force-dynamic'
 export const revalidate = 60 // Revalidate setiap 60 detik
 
 export default async function DashboardPage() {

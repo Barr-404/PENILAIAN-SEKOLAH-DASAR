@@ -3,15 +3,18 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   experimental: {
-    optimizeCss: true,
+    optimizeCss: false,
     optimizePackageImports: ['lucide-react', 'exceljs'],
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  // Disable static export untuk mendukung SSR dan API routes
+  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
   // Optimasi image dan font
   images: {
     formats: ['image/avif', 'image/webp'],
+    unoptimized: true, // Disable image optimization untuk Vercel
   },
   // Optimasi bundle
   webpack: (config, { dev, isServer }) => {
