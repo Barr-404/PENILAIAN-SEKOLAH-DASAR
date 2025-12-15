@@ -51,8 +51,9 @@ export async function POST(request: Request) {
     return NextResponse.json(subject, { status: 201 })
   } catch (error) {
     console.error('Subject creation error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Terjadi kesalahan server' },
+      { error: errorMessage },
       { status: 500 }
     )
   }
